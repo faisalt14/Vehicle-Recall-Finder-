@@ -25,6 +25,31 @@ def get_json():
     # print(response.json())
 
 
+
+def get_summary(recall_num: int) -> str:
+    recall_num = recall_num
+    
+
+    api_key = os.getenv('api_key')
+    email = os.getenv('email')
+
+
+
+
+
+    request_link = f'https://vrdb-tc-apicast-production.api.canada.ca/eng/vehicle-recall-database/v1/recall-summary/recall-number/{recall_num}'
+    header = {"Accept": "application/json", "user-key": api_key }
+    response = requests.get(request_link, headers=header, auth=(email, api_key))   
+    get_json.var = response.json() # raw JSON dictionary
+    raw_json = get_json.var
+    # print(response.json())
+
+
+    summary = raw_json["ResultSet"][0][11]["Value"]["Literal"] + """ """
+    return summary
+
+
+
 def format_json():
     total_recalls = len(get_json.var["ResultSet"])
     raw_json = get_json.var
@@ -53,20 +78,23 @@ def format_json():
         print()
         print("|", "   " + vehicle_make, " "*(6-len(vehicle_make)), "|", "  |", "   " + vehicle_model, " "*(7-len(vehicle_model)), "|", "  |", "   " + vehicle_year, " "*(6-len(vehicle_year)), "|", "  |", "   " + str(recall_num), " "*(14-len(str(recall_num))), "|", "  |", "   " + recall_date, " "*(11-len(recall_date)), "|"  )
         print()
+        print()
+
+
+        text = "Summary"
+        underlined_text = "\x1B[4m" + text + "\x1B[0m"
+        print(underlined_text) 
+        print()
+
+        summary = get_summary(recall_num)
+        print(summary)
 
         
 
 
-        
-
-        # print("Recall Number:",  recall_num)
-        # print("Recall Date: " + recall_date)
+    
 
         
-
-
-
-
 
 
 
@@ -74,8 +102,8 @@ def format_json():
 
 if __name__ == '__main__':
     configure()
-    get_json()
     
-
-
+    get_json()
     format_json()
+
+    # get_summary(2013111)
