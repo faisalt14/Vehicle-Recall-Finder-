@@ -1,4 +1,5 @@
 from curses import raw
+from tabnanny import check
 from typing_extensions import Self
 import requests
 import json
@@ -19,7 +20,11 @@ class RecallApp:
         self.email = None
         self.rawJson = None
 
-        
+
+        self.year_flag = False
+        self.make_flag = False
+        self.model_flag = False
+
         
 
     def configure(self):
@@ -27,11 +32,55 @@ class RecallApp:
 
     def prompt(self):
 
-        self.make = input("Please enter the make of the vehicle: ")
-        self.model = input("Please enter the model name: ")
-        self.year= input("Please enter the year range (Ex: 2002-2004): " )
         
-        
+        while len(self.make) == 0: 
+            self.make = input("Please enter the make of the vehicle: ")
+
+
+
+        while len(self.model) == 0:     
+            self.model = input("Please enter the model name: ")
+
+
+                
+        while len(self.year) != 9:
+            self.year= input("Please enter the year range (Ex: 2002-2004): " )    
+
+        self.year_flag = self.check_year()
+
+        while self.year_flag != True: 
+            self.year= input("Please enter the year range (Ex: 2002-2004): " )
+            self.year_flag = self.check_year()
+             
+
+
+    def check_year(self) -> bool: 
+
+
+        if len(self.year) != 9: 
+            return False
+
+        else:    
+            
+            self.year_flag = False
+
+            year1 = self.year[:4]
+            dash = self.year[4]
+            year2 = self.year[5:]        
+
+            if year1.isnumeric() and dash == "-" and year2.isnumeric():
+            
+                if int(year1) > int(year2): 
+                    print("The first year must be smaller than the second year in the range.")
+                    
+                    self.year_flag = False
+                else: 
+            
+                    self.year_flag = True    
+
+            return self.year_flag
+
+
 
 
     def get_json(self): 
@@ -43,7 +92,7 @@ class RecallApp:
 
         # request_link = 'https://vrdb-tc-apicast-production.api.canada.ca/eng/vehicle-recall-database/v1/recall/make-name/honda/model-name/civic/year-range/2002-2002'
         request_link = f'https://vrdb-tc-apicast-production.api.canada.ca/eng/vehicle-recall-database/v1/recall/make-name/{self.make}/model-name/{self.model}/year-range/{self.year}'
-        print(request_link)
+        # print(request_link)
         header = {"Accept": "application/json", "user-key": self.api_key }
         response = requests.get(request_link, headers=header, auth=(self.email, self.api_key))   
         self.rawJson = response.json() # raw JSON dictionary
@@ -134,6 +183,8 @@ if __name__ == '__main__':
     app.configure()
 
     app.prompt()
+
+
     app.get_json()
     app.format_json()
 
