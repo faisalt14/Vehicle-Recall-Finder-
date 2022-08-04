@@ -54,6 +54,8 @@ class RecallApp:
              
 
 
+
+
     def check_year(self) -> bool: 
 
 
@@ -90,14 +92,15 @@ class RecallApp:
 
 
 
-        # request_link = 'https://vrdb-tc-apicast-production.api.canada.ca/eng/vehicle-recall-database/v1/recall/make-name/honda/model-name/civic/year-range/2002-2002'
+        # request_link = 'https://vrdb-tc-apicast-production.api.canada.ca/eng/vehicle-recall-database/v1/recall/make-name/toyota/model-name/camry/year-range/2012-2015'
         request_link = f'https://vrdb-tc-apicast-production.api.canada.ca/eng/vehicle-recall-database/v1/recall/make-name/{self.make}/model-name/{self.model}/year-range/{self.year}'
         # print(request_link)
         header = {"Accept": "application/json", "user-key": self.api_key }
         response = requests.get(request_link, headers=header, auth=(self.email, self.api_key))   
         self.rawJson = response.json() # raw JSON dictionary
-        # print(response)
+        # print(response.json())
 
+        
 
 
     def get_summary(self, recall_num: int) -> str:
